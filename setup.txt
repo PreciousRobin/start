@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# update
+sudo apt update
+sudo apt -y upgrade
+
+# install mysql
+sudo apt -y install mysql-server
+
+# install sakilla db
+sudo wget http://downloads.mysql.com/docs/sakila-db.tar.gz
+sudo tar xzf sakila-db.tar.gz -C /tmp/
+sudo mysql -e "SOURCE /tmp/sakila-db/sakila-schema.sql;"
+sudo mysql -e "SOURCE /tmp/sakila-db/sakila-data.sql;"
+
+# install sysbench
+curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.deb.sh | sudo bash
+sudo apt -y install sysbench
+
+# mysql_secure_installation
+sudo mysql -e "SET PASSWORD FOR root@localhost = PASSWORD('password');FLUSH PRIVILEGES;"
+sudo mysql -e "DELETE FROM mysql.user WHERE User='';"
+sudo mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+sudo mysql -e "DROP DATABASE test;DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';"
